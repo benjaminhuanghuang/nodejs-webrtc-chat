@@ -3,49 +3,20 @@ var express = require('express');
 var app = express();
 var expressServer = require('http').createServer(app)
 var io = require('socket.io').listen(expressServer);
+var MessageTypes = require('./messageType.js');
 
+expressServer.listen(process.env.PORT || 3010);
 
-users = [];
-connections = [];
-server.listen(process.env.PORT || 3010);
+app.use(express.static(__dirname + '/client'));
 
+var peerServer = new PeerServer({ port: 9010, path: '/chat' });
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+peerServer.on('connection', function (id) {
+  io.emit(MessageTypes.USER_CONNECTED, id);
+  console.log('User connected with #', id);
 });
 
-io.sockets.on('connection', function (socket) {
-    connections.push(socket);
-    console.log('Connected: %s socket connected', connections.length);
-
-    // Disconnect
-    socket.on('disconnect', function (data) {
-        users.splice(users.indexOf(socket.username), 1);
-        updateUsernames();
-
-        connections.splice(connections.indexOf(socket), 1);
-        console.log('Disconnected: %s socket connected', connections.length);
-    });
-
-    // Send message
-    socket.on('send message', function (data) {
-        console.log(data);
-        io.sockets.emit('new message', {
-            msg: data,
-            user:socket.username
-        })
-    });
-
-    //new user
-    socket.on('new user', function (data, callback) {
-        console.log(data);
-        callback(true);
-        socket.username = data;
-        users.push(socket.username);
-        updateUsernames();
-    });
-
-    function updateUsernames() {
-        io.sockets.emit('get users', users);
-    }
+peerServer.on('disconnect', function (id) {
+  io.emit(MessageTypes.USER_DISCONNECTED, id);
+  console.log('With #', id, 'user disconnected.');
 });
