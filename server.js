@@ -1,15 +1,18 @@
-var PeerServer = require('peer').PeerServer;
-var express = require('express');
-var app = express();
-var expressServer = require('http').createServer(app)
-var io = require('socket.io').listen(expressServer);
-var MessageTypes = require('./messageType.js');
+const PeerServer = require('peer').PeerServer;
+const express = require('express');
+const morgan = require('morgan');
+const app = express();
+const expressServer = require('http').createServer(app)
+const io = require('socket.io').listen(expressServer);
+//
+const MessageTypes = require('./messageType.js');
 
 expressServer.listen(process.env.PORT || 3010);
 
+app.use(morgan('combined'));
 app.use(express.static(__dirname + '/client'));
 
-var peerServer = new PeerServer({ port: 9010, path: '/chat' });
+var peerServer = new PeerServer({ port: 8010, path: '/chat' });
 
 peerServer.on('connection', function (id) {
   io.emit(MessageTypes.USER_CONNECTED, id);
