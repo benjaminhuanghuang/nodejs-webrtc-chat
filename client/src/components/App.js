@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 //
 import Peer from 'peerjs';
 //
-import ChatBox from './ChatBox';
-
 export default class App extends Component {
   state = {
     hasUserMedia: false,
@@ -22,6 +20,7 @@ export default class App extends Component {
     this.state.peer = new Peer({key: 'qv3hp6ln05w5ewmi'});
     
     this.state.peer.on('open', ()=>{
+      console.log("peer open #", this.state.peer.id);
       this.setState({peerId: this.state.peer.id})
     });
 
@@ -31,16 +30,18 @@ export default class App extends Component {
 
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     
-    navigator.getUserMedia({audio: true, video: true}, (stream)=>{
-      window.localStream = stream;
-      this.userVideo.src = window.URL.createObjectURL(stream);
-      window.peer_stream = stream;
+    // User audio and video
+    navigator.getUserMedia({audio: true, video: true}, 
+      (stream)=>{
+        window.localStream = stream;
+        this.userVideo.src = window.URL.createObjectURL(stream);
+        window.peer_stream = stream;
+      },
+      (error)=>{
+        console.log(error);
+        alert('An error occured. Please try again');
+      });
     }
-    , (error)=>{
-      console.log(error);
-      alert('An error occured. Please try again');
-    });
-  }
 
   onReceiveCall(call){
     call.answer(window.localStream);
@@ -55,14 +56,6 @@ export default class App extends Component {
     onReceiveStream(stream, 'my-camera');
   }
   
-
-  hasGetUserMedia() {
-    return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-              navigator.mozGetUserMedia || navigator.msGetUserMedia);
-  }
-
-  
-
   handleMessage(data){
     this.state.messages.push(data);
   }
@@ -112,9 +105,7 @@ export default class App extends Component {
 
   onCallClick()
   {
-    console.log('now calling: ' + peer_id);
-    console.log(peer);
-    var call = this.state.peer.call(peer_id, window.localStream);
+    var call = this.state.peer.call(this.state.peer_id, window.localStream);
     call.on('stream', function(stream){
       window.peer_stream = stream;
       onReceiveStream(stream, 'peer-camera');
@@ -137,7 +128,7 @@ export default class App extends Component {
             <h4>ID: <span id="id"></span></h4>
             <input type="text" name="name" id="name" placeholder="Name"/>
             <input type="text" name="peer_id" id="peer_id" placeholder="Peer ID"
-              value={this.state.peerId} onChange={(event)=>this.onPeerIDInputChange(event)} 
+              value={this.state.peerId} onChange={(event)=>this.onPeerIdInputChange(event)} 
             />
             <div id="connected_peer_container">
               Connected Peer:
