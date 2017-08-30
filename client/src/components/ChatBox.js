@@ -1,10 +1,15 @@
 
 import React from 'react';
 import { Component } from 'react';
+//
+import MessagesList from './MessageList';
+import MessageInput from './MessageInput';
+import UsersList from './UserList';
 
 export default class ChatBox extends Component{
-
-
+    state ={
+      users:[]
+    }
     render()
     {
       return (

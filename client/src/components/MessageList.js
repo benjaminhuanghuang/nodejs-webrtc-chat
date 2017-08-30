@@ -1,19 +1,22 @@
 import React, { Component } from "react";
 
-// 
-import ChatMessage from './ChatMessage';
+//
+import ChatMessage from "./ChatMessage";
 
-export default class MessageList extends Component{
+export default class MessageList extends Component {
+  state = {
+    messages: []
+  };
 
-  render () {
+  render() {
     var messages;
-    messages = this.state.messages.map(function (m) {
-      return (
-        <ChatMessage message={m}></ChatMessage>
-      );
-    });
+
     if (!messages.length) {
       messages = <div className="chat-no-messages">No messages</div>;
+    } else {
+      messages = this.state.messages.map(function(m) {
+        return <ChatMessage message={m} />;
+      });
     }
 
     return (
