@@ -12,8 +12,9 @@ expressServer.listen(process.env.PORT || 8010);
 app.use(morgan('combined'));
 app.use(express.static(__dirname + '/client'));
 
+//create a PeerJS server that runs on port 8020
 //responsible for handling the signaling between the different peers
-const peerServer = new PeerServer({ port: 8021, path: '/chat' });
+const peerServer = new PeerServer({ port: 8020, path: '/peerjs' });
 
 /*
 Once PeerServer detects that a peer has been connected to it, it triggers the event 
